@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TOFIVE — Distance to Five</title>
+<meta name="description" content="A ledger of BitMine's disclosed ETH holdings and the distance to 5% of the stated supply.">
+
+<!--
+  ============================================================
+  HOW TO UPDATE — every Monday, after the X post
+  ============================================================
+
+  1. Copy one <tr> block from the table below.
+  2. Paste it as the FIRST row inside <tbody> (newest at top).
+  3. Fill every cell from the release. Do not round in data-exact.
+  4. Update the three values in the "Latest" block near the top:
+     the distance figure, the reported date, and the "as of" line.
+  5. Update <span id="updated"> at the bottom.
+
+  RULES
+  - No row without a verified release. No estimates. No forecasts.
+  - Every figure carries the date it was observed, not the date
+    the release was published. They are often different.
+  - Store exact values in data-exact. Display rounded.
+  ============================================================
+-->
+
+<style>
+:root {
+  --paper: #F1F2F4;
+  --panel: #FFFFFF;
+  --ink: #171C22;
+  --ink-mid: #4E5964;
+  --ink-soft: #7A848F;
+  --rule: #D3D7DC;
+  --rule-soft: #E3E6E9;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121519;
+    --panel: #171B20;
+    --ink: #E6E9ED;
+    --ink-mid: #A2ACB6;
+    --ink-soft: #7C858F;
+    --rule: #2C3238;
+    --rule-soft: #22262B;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #121519;
+  --panel: #171B20;
+  --ink: #E6E9ED;
+  --ink-mid: #A2ACB6;
+  --ink-soft: #7C858F;
+  --rule: #2C3238;
+  --rule-soft: #22262B;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 61rem;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+}
+
+/* masthead */
+
+.mast {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding-bottom: 1rem;
+}
+
+.mast h1 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.mast p {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--ink-mid);
+}
+
+/* latest reading */
+
+.latest {
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+  padding: 2.25rem 0 2rem;
+  margin-bottom: 2.75rem;
+}
+
+.figure {
+  margin: 0;
+  font-size: clamp(3.75rem, 17vw, 7.5rem);
+  font-weight: 300;
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+}
+
+.figure-unit {
+  margin: 0.85rem 0 0;
+  font-size: 1.0625rem;
+  color: var(--ink-mid);
+  max-width: 34rem;
+}
+
+.figure-meta {
+  margin: 1.5rem 0 0;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+}
+
+.figure-meta span { display: block; }
+
+/* sections */
+
+section { margin-bottom: 2.75rem; }
+
+h2 {
+  margin: 0 0 1rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* ledger */
+
+.scroll {
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 46rem;
+  font-size: 0.875rem;
+}
+
+thead th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink-mid);
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--rule-soft);
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+tbody tr:last-child td { border-bottom: 0; }
+
+td.num { text-align: right; }
+th.num { text-align: right; }
+
+td.lead { font-weight: 600; }
+
+td.dates {
+  white-space: normal;
+  color: var(--ink-mid);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  min-width: 9rem;
+}
+
+td.dates span { display: block; }
+
+.hint {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--ink-soft);
+}
+
+/* notes */
+
+.note {
+  border-left: 2px solid var(--rule);
+  padding-left: 1rem;
+  margin: 0 0 1rem;
+  color: var(--ink-mid);
+  font-size: 0.9375rem;
+  max-width: 44rem;
+}
+
+.note b { color: var(--ink); font-weight: 600; }
+
+.method {
+  margin: 0;
+  max-width: 44rem;
+  font-size: 0.9375rem;
+  color: var(--ink-mid);
+}
+
+.method li { margin-bottom: 0.55rem; }
+
+.method code {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.8125rem;
+  color: var(--ink);
+}
+
+/* footer */
+
+footer {
+  border-top: 1px solid var(--rule);
+  padding-top: 1.5rem;
+  font-size: 0.8125rem;
+  color: var(--ink-soft);
+  max-width: 44rem;
+}
+
+footer p { margin: 0 0 0.6rem; }
+
+footer a { color: var(--ink-mid); }
+
+footer a:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (max-width: 40rem) {
+  .wrap { padding-top: 2rem; }
+  .latest { padding-top: 1.75rem; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <h1>TOFIVE</h1>
+    <p>I count. I do not vote.</p>
+  </header>
+
+  <div class="latest">
+    <p class="figure" id="distance">143,622</p>
+    <p class="figure-unit">ETH between BitMine's disclosed holdings and 5% of the supply figure BitMine states.</p>
+    <p class="figure-meta">
+      <span id="reported">Release of 14 September 2026</span>
+      <span id="asof">Holdings observed 13 September 2026</span>
+    </p>
+  </div>
+
+  <section>
+    <h2>Ledger</h2>
+    <div class="scroll" tabindex="0">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Release</th>
+            <th scope="col" class="num">Holdings (ETH)</th>
+            <th scope="col" class="num">Stated supply</th>
+            <th scope="col" class="num">Share</th>
+            <th scope="col" class="num">Distance to 5%</th>
+            <th scope="col" class="num">Reported purchase</th>
+            <th scope="col">Source dates</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td class="lead">14 Sep 2026</td>
+            <td class="num" data-exact="5956378">5,956,378</td>
+            <td class="num" data-exact="122000000">122,000,000</td>
+            <td class="num" data-exact="4.882277">4.88%</td>
+            <td class="num" data-exact="143622">143,622</td>
+            <td class="num" data-exact="27180">+27,180</td>
+            <td class="dates">
+              <span>Holdings 13 Sep</span>
+              <span>Staked 7 Sep</span>
+              <span>Purchase: prior week</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="lead">8 Sep 2026</td>
+            <td class="num" data-exact="5929198">5,929,198</td>
+            <td class="num" data-exact="122000000">122,000,000</td>
+            <td class="num" data-exact="4.859998">4.86%</td>
+            <td class="num" data-exact="170802">170,802</td>
+            <td class="num" data-exact="28086">+28,086</td>
+            <td class="dates">
+              <span>Holdings 7 Sep</span>
+              <span>Purchase: prior week</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="lead">31 Aug 2026</td>
+            <td class="num" data-exact="5901112">5,901,112</td>
+            <td class="num" data-exact="120700000">120,700,000</td>
+            <td class="num" data-exact="4.889073">4.89%</td>
+            <td class="num" data-exact="133888">133,888</td>
+            <td class="num" data-exact="53501">+53,501</td>
+            <td class="dates">
+              <span>Holdings 30 Aug</span>
+              <span>Purchase: prior week</span>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">Earlier releases will be added once each figure has been checked against its source.</p>
+  </section>
+
+  <section>
+    <h2>Notes</h2>
+    <p class="note"><b>The stated supply changed between 31 August and 8 September</b>, from 120.7 million to 122.0 million. The distance is measured against 5% of whichever figure the release states, so it moved with the divisor.</p>
+    <p class="note"><b>Figures in one release can carry different observation dates.</b> In the release of 14 September, holdings were observed on 13 September and the staked figure on 7 September. Both dates are recorded here so that no two numbers are compared across a gap without it being visible.</p>
+    <p class="note"><b>A reported purchase covers the week before the release</b>, not the interval between observation dates. It is recorded as reported and is not used to reconstruct holdings.</p>
+  </section>
+
+  <section>
+    <h2>Method</h2>
+    <ul class="method">
+      <li>The share is holdings divided by the supply figure stated in the same release. That divisor is BitMine's, not an independent measurement.</li>
+      <li>The distance is 5% of that stated supply, less holdings. For 14 September: <code>6,100,000 − 5,956,378 = 143,622</code>.</li>
+      <li>Exact values are kept in the page source. Displayed values are rounded. The share for 14 September is <code>4.882277%</code>.</li>
+      <li>Every row comes from a published release. Nothing here is estimated, projected, or dated forward.</li>
+      <li>Where a figure cannot be verified, it is left out rather than approximated.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>Not affiliated with BitMine, BMNR, Ethereum, the Ethereum Foundation, Robinhood or Pons. Figures are taken from BitMine's public releases and may be superseded by later disclosures.</p>
+    <p>Nothing here is investment advice.</p>
+    <p>Last updated <span id="updated">14 September 2026</span>. <a href="https://x.com/distancetofive">@distancetofive</a></p>
+  </footer>
+
+</div>
+</body>
+</html>
